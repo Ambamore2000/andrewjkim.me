@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>About - Andrew J Kim</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: Kelly
+  * Updated: Jul 27 2023 with Bootstrap v5.3.1
+  * Template URL: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+    <!-- Include Highcharts library -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/stock.js"></script> <!-- Include Highstock module for stock charts -->
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+
+      <h1 class="logo me-auto me-lg-0"><a href="index.html">Andrew</a></h1>
+      <!-- Uncomment below if you prefer to use an image logo -->
+      <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+      <nav id="navbar" class="navbar order-last order-lg-0">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a class="active" href="about.html">About</a></li>
+          <li><a href="resume.html">Resume</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+
+      <div class="header-social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
+      </div>
+
+    </div>
+
+  </header><!-- End Header -->
+
+  <main id="main">
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+  
+          <div class="section-title">
+            <h2>Whale Activity</h2>
+          </div>
+        </div>
+
+        <!-- Create a container for the chart -->
+        <div id="cryptoChart" style="height: 300px; width: 100%;"></div>
+        <div id="barChart" style="height: 300px; width: 100%;"></div>
+
+        <script>
+            // Load your JSON data from crypto_data.json
+            fetch('crypto_data.json')
+              .then(response => response.json())
+              .then(data => {
+                // Prepare the data for Highcharts
+                const allSeriesData = [];
+          
+                function getSeriesData(index) {
+                  const seriesData = data[index].data.quotes.map(quote => {
+                    return {
+                      x: new Date(quote.timeOpen).getTime(),
+                      y: quote.quote.close
+                    };
+                  });
+                  return seriesData;
+                }
+          
+                for (let i = 0; i < data.length; i++) {
+                  const seriesData = getSeriesData(i);
+                  allSeriesData.push(...seriesData);
+                }
+          
+                allSeriesData.sort((a, b) => a.x - b.x);
+                console.log(allSeriesData);
+          
+                // Create the line chart with a range selector
+                Highcharts.stockChart('cryptoChart', {
+                  chart: {
+                    zoomType: 'none', // Disable zooming on the x-axis
+                    backgroundColor: '#141414', // Set the background color to black
+                  },
+                  navigator: {
+                    enabled: false, // Disable the navigator
+                  },
+                  scrollbar: {
+                    enabled: false, // Disable the scrollbar
+                  },
+                  xAxis: {
+                    type: 'datetime',
+                    min: allSeriesData[0].x, // Set the min to the timestamp of the first data point
+                    max: allSeriesData[allSeriesData.length - 1].x, // Set the max to the timestamp of the last data point
+                  },
+                  yAxis: {
+                    type: 'logarithmic', // Set the yAxis to logarithmic scale
+                    title: {
+                      text: 'Price',
+                      style: {
+                        color: '#ffffff' // Set yAxis title text color to white
+                      }
+                    },
+                    gridLineWidth: 0 // Remove horizontal grid lines for the "Price" chart
+                  },
+                  series: [{
+                    name: 'Crypto Price',
+                    data: allSeriesData,
+                    type: 'line',
+                    color: '#4141DD',
+                    turboThreshold: 5000, // Set the turboThreshold to 2000
+                  }],
+                  rangeSelector: {
+                    enabled: false, // Disable the range selector slider
+                  }
+                });
+          
+                function readCSVAndExtractData() {
+                  return fetch('generated.csv') // Fetch the CSV file
+                    .then(response => response.text()) // Get the text content
+                    .then(csvData => {
+                      // Initialize arrays to store the extracted data
+                      const buyData = [];
+                      const sellData = [];
+          
+                      // Split the CSV data into lines
+                      const lines = csvData.split('\n');
+          
+                      // Parse each line of the CSV (skip the header line)
+                      for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line === '') continue; // Skip empty lines
+          
+                        const values = line.split(',');
+          
+                        // Extract "timestamp" (x), "buy_volume" (y), and "sell_volume" (z) values
+                        const timestamp = new Date(values[0]).getTime();
+                        const buyVolume = parseFloat(values[1]);
+                        const sellVolume = Math.abs(parseFloat(values[2])); // Absolute value of sell_volume
+          
+                        buyData.push({ x: timestamp, y: buyVolume });
+                        sellData.push({ x: timestamp, y: sellVolume });
+                      }
+          
+                      return { buyData, sellData };
+                    })
+                    .catch(error => {
+                      console.error('Error loading CSV data:', error);
+                      return { buyData: [], sellData: [] }; // Return empty arrays in case of an error
+                    });
+                }
+          
+                readCSVAndExtractData()
+                  .then(data => {
+                    const buyChartData = data.buyData;
+                    const sellChartData = data.sellData;
+          
+                    buyChartData.sort((a, b) => a.x - b.x);
+                    sellChartData.sort((a, b) => a.x - b.x);
+          
+                    console.log(buyChartData);
+                    console.log(sellChartData);
+          
+                    // Create the bar chart with two series
+                    Highcharts.chart('barChart', {
+                      chart: {
+                        type: 'column',
+                        backgroundColor: '#141414', // Set the background color to black
+                      },
+                      title: {
+                        text: '',
+                        style: {
+                          color: '#ffffff' // Set title text color to white
+                        }
+                      },
+                      xAxis: {
+                        type: 'datetime',
+                        min: allSeriesData[0].x,
+                        max: allSeriesData[allSeriesData.length - 1].x
+                      },
+                      yAxis: {
+                        type: 'logarithmic',
+                        title: {
+                          text: 'Value',
+                          style: {
+                            color: '#ffffff' // Set yAxis title text color to white
+                          }
+                        },
+                        min: 1,
+                        max: 50000,
+                        gridLineWidth: 0 // Remove horizontal grid lines
+                      },
+                      series: [{
+                        name: 'Amount Bought',
+                        data: buyChartData,
+                        color: '#90EE90',
+                        turboThreshold: 5000
+                      }, {
+                        name: 'Amount Sold',
+                        data: sellChartData,
+                        color: '#FF0000', // You can change the color for sell data
+                        turboThreshold: 5000
+                      }]
+                    });
+                    // You can perform further processing with the data here
+                  });
+              })
+              .catch(error => {
+                console.error('Error loading JSON data:', error);
+              });
+          </script>
+    
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>AndrewJKim</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/ -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer><!-- End  Footer -->
+
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
